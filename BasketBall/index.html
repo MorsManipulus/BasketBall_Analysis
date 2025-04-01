@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USA Basketball Team Network</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.css">
+    <style>
+        /* General Layout */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Basketball Court Styling */
+        #basketballCourt {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f4f4f4;
+            z-index: -1;
+        }
+
+        /* Evaluation Bar */
+        #evaluationBar {
+            width: 100%;
+            height: 30px;
+            background-color: #444;
+            position: fixed;
+            bottom: 20px;
+            z-index: 9999;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        #healthBar {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            transition: width 0.5s ease-out;
+        }
+
+        /* Developer Information */
+        #developerInfo {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 9999;
+        }
+
+        /* Network Visualization */
+        #mynetwork {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        /* Animation Keyframes */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Court Design Enhancements */
+        .court-line {
+            stroke: #FFF;
+            stroke-width: 2;
+        }
+        .court-line-dashed {
+            stroke: #FFF;
+            stroke-width: 2;
+            stroke-dasharray: 5, 5;
+        }
+        .court-circle {
+            fill: transparent;
+            stroke: #FFF;
+            stroke-width: 2;
+        }
+        .court-text {
+            fill: white;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="developerInfo">Developed by Ranveer</div>
+    <div id="evaluationBar">
+        <div id="healthBar"></div>
+    </div>
+    <div id="basketballCourt"></div>
+    <div id="mynetwork"></div>
+
+    <script>
+        function drawCourt() {
+            const courtCanvas = document.createElement("canvas");
+            courtCanvas.width = window.innerWidth;
+            courtCanvas.height = window.innerHeight;
+            document.getElementById('basketballCourt').appendChild(courtCanvas);
+
+            const ctx = courtCanvas.getContext("2d");
+
+            // Court Dimensions and Styling
+            ctx.fillStyle = "#4CBB17"; // Court background color
+            ctx.fillRect(0, 0, courtCanvas.width, courtCanvas.height);
+
+            // Draw Half-Court Line
+            ctx.beginPath();
+            ctx.moveTo(courtCanvas.width / 2, 0);
+            ctx.lineTo(courtCanvas.width / 2, courtCanvas.height);
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Draw 3-Point Arc
+            ctx.beginPath();
+            ctx.arc(courtCanvas.width / 4, courtCanvas.height / 2, 180, Math.PI / 2, Math.PI * 3 / 2);
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(3 * courtCanvas.width / 4, courtCanvas.height / 2, 180, Math.PI * 3 / 2, Math.PI / 2);
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw Key Area (The Paint)
+            ctx.beginPath();
+            ctx.rect(courtCanvas.width / 2 - 60, courtCanvas.height / 2 - 100, 120, 200);
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw Hoops
+            ctx.beginPath();
+            ctx.arc(courtCanvas.width / 4, courtCanvas.height / 2, 20, 0, 2 * Math.PI); // Left Hoop
+            ctx.arc(3 * courtCanvas.width / 4, courtCanvas.height / 2, 20, 0, 2 * Math.PI); // Right Hoop
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw the Center Circle
+            ctx.beginPath();
+            ctx.arc(courtCanvas.width / 2, courtCanvas.height / 2, 60, 0, 2 * Math.PI);
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Labels for Court (optional for design)
+            ctx.font = "bold 20px Arial";
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillText("Basketball Court", courtCanvas.width / 2 - 80, 30);
+
+            // Draw Center Line
+            ctx.setLineDash([5, 5]);  // Dashed lines
+            ctx.beginPath();
+            ctx.moveTo(courtCanvas.width / 2, 0);
+            ctx.lineTo(courtCanvas.width / 2, courtCanvas.height);
+            ctx.strokeStyle = "#FFFFFF";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function drawGraph() {
+            const nodes = new vis.DataSet([
+                {id: 1, label: "LeBron James\n(27.5 PPG)", value: 95, size: 40, color: "#FFD700", title: "All-Time Leader\n4x NBA Champ\n4x MVP", winningChances: 90, x: 0.05, y: 0.2},
+                {id: 2, label: "Kevin Durant\n(29.1 PPG)", value: 90, size: 38, color: "#FF4500", title: "Olympic Scoring Leader\n2x NBA Champ", winningChances: 85, x: 0.2, y: 0.5},
+                {id: 3, label: "Stephen Curry\n(24.3 PPG)", value: 88, size: 36, color: "#00BFFF", title: "3pt Record Holder\n4x NBA Champ", winningChances: 88, x: 0.95, y: 0.2},
+                {id: 4, label: "Kawhi Leonard\n(24.8 PPG)", value: 85, size: 32, color: "#8A2BE2", title: "2x NBA Champion\nDefensive Specialist", winningChances: 82, x: 0.75, y: 0.5},
+                {id: 5, label: "Anthony Davis\n(25.9 RPG)", value: 84, size: 30, color: "#32CD32", title: "Defensive Anchor\n2x NBA Champion", winningChances: 83, x: 0.75, y: 0.7},
+                {id: 6, label: "James Harden\n(24.7 APG)", value: 83, size: 28, color: "#FF6347", title: "MVP\nOffensive Playmaker", winningChances: 90, x: 0.1, y: 0.8},
+                {id: 7, label: "Jayson Tatum\n(26.9 PPG)", value: 80, size: 26, color: "#00FF00", title: "Scorer & Defender", winningChances: 75, x: 0.5, y: 0.3},
+                {id: 8, label: "Devin Booker\n(26.8 PPG)", value: 78, size: 24, color: "#FF69B4", title: "Elite Shooter", winningChances: 77, x: 0.95, y: 0.3},
+                {id: 9, label: "Bam Adebayo\n(11.5 RPG)", value: 77, size: 22, color: "#1E90FF", title: "Rim Protector", winningChances: 80, x: 0.9, y: 0.7},
+                {id: 10, label: "Chris Paul\n(10.7 APG)", value: 75, size: 20, color: "#808080", title: "Veteran Playmaker", winningChances: 85, x: 0.05, y: 0.8},
+                {id: 11, label: "Draymond Green\n(8.9 RPG)", value: 72, size: 18, color: "#008000", title: "Defensive Master", winningChances: 70, x: 0.7, y: 0.3},
+                {id: 12, label: "Damian Lillard\n(28.8 PPG)", value: 70, size: 16, color: "#4B0082", title: "Elite Scorer", winningChances: 75, x: 0.5, y: 0.5}
+            ]);
+
+            const edges = new vis.DataSet([
+                {from: 1, to: 2, value: 15, title: "Primary Scoring Duo"},
+                {from: 3, to: 1, value: 12, title: "3pt Specialists Connection"},
+                {from: 1, to: 5, value: 18, title: "Pick-and-Roll Combo"},
+                {from: 4, to: 5, value: 10, title: "Defensive Wall"},
+                {from: 9, to: 11, value: 8, title: "Rebound Partnership"},
+                {from: 3, to: 6, value: 9, title: "Backcourt Playmaking"},
+                {from: 8, to: 10, value: 7, title: "Bench Leadership"},
+                {from: 2, to: 7, value: 6, title: "Scoring Support"},
+                {from: 5, to: 9, value: 5, title: "Frontcourt Rotation"}
+            ]);
+
+            const container = document.getElementById('mynetwork');
+            const data = { nodes, edges };
+
+            const options = {
+                nodes: {
+                    scaling: { min: 16, max: 40 },
+                    font: { size: 14, color: '#FFFFFF' },
+                    shape: 'circle',
+                    physics: false,
+                },
+                edges: {
+                    width: 2,
+                    smooth: { type: 'continuous' }
+                },
+                interaction: {
+                    tooltipDelay: 200,
+                    hideEdgesOnDrag: true
+                },
+                manipulation: {
+                    enabled: true,
+                    initiallyActive: true,
+                    addNode: false,
+                    addEdge: false,
+                    editNode: true,
+                }
+            };
+
+            const network = new vis.Network(container, data, options);
+
+            function calculatePlayerHealthBar(playerChances) {
+                let health = Math.floor(playerChances);
+                document.getElementById("healthBar").style.width = health + "%";
+            }
+
+            network.on('dragEnd', function(event) {
+                const draggedNode = event.nodes[0];
+                const draggedPlayer = nodes.get(draggedNode);
+                draggedPlayer.winningChances -= 5;
+                calculatePlayerHealthBar(draggedPlayer.winningChances);
+                event.preventDefault();
+            });
+        }
+
+        drawCourt();
+        drawGraph();
+    </script>
+</body>
+</html>

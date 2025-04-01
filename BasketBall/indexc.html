@@ -1,0 +1,232 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+#mynetwork {
+            width: 100vw;
+            height: 100vh;
+            background-color: #222222;
+            border: 1px solid lightgray;
+        }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  const nodes = new vis.DataSet([
+  {"color":"#97c2fc","font":{"color":"white"},"id":"LeBron","label":"LeBron James\nSF/PF • Lakers • 25/7/7","shape":"dot","size":46},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Durant","label":"Kevin Durant\nSF • Suns • 29/6/5","shape":"dot","size":32},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Curry","label":"Stephen Curry\nPG • Warriors • 29/6/6","shape":"dot","size":16},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Giannis","label":"Giannis Antetokounmpo\nPF • Bucks • 31/12/6","shape":"dot","size":12},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Jokic","label":"Nikola Jokic\nC • Nuggets • 25/12/9","shape":"dot","size":14},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Luka","label":"Luka Dončić\nPG • Mavericks • 33/9/9","shape":"dot","size":7},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Embiid","label":"Joel Embiid\nC • 76ers • 34/11/6","shape":"dot","size":10},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Tatum","label":"Jayson Tatum\nSF • Celtics • 27/8/4","shape":"dot","size":19},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Morant","label":"Ja Morant\nPG • Grizzlies • 26/6/8","shape":"dot","size":4},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Booker","label":"Devin Booker\nSG • Suns • 27/5/7","shape":"dot","size":9},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Butler","label":"Jimmy Butler\nSF • Heat • 22/6/5","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Davis","label":"Anthony Davis\nPF/C • Lakers • 26/12/3","shape":"dot","size":10},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Leonard","label":"Kawhi Leonard\nSF • Clippers • 24/6/4","shape":"dot","size":8},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"George","label":"Paul George\nSF • Clippers • 23/6/5","shape":"dot","size":6},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Young","label":"Trae Young\nPG • Hawks • 26/3/10","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Mitchell","label":"Donovan Mitchell\nSG • Cavaliers • 28/5/5","shape":"dot","size":14},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Haliburton","label":"Tyrese Haliburton\nPG • Pacers • 20/4/10","shape":"dot","size":9},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"SGA","label":"Shai Gilgeous-Alexander\nSG • Thunder • 31/5/6","shape":"dot","size":12},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Wembanyama","label":"Victor Wembanyama\nC • Spurs • 21/10/3","shape":"dot","size":7},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Ball","label":"LaMelo Ball\nPG • Hornets • 24/6/8","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Edwards","label":"Anthony Edwards\nSG • Timberwolves • 26/6/5","shape":"dot","size":10},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Sabonis","label":"Domantas Sabonis\nC • Kings • 19/13/8","shape":"dot","size":8},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Fox","label":"De'Aaron Fox\nPG • Kings • 27/4/6","shape":"dot","size":6},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Irving","label":"Kyrie Irving\nPG • Mavericks • 25/5/5","shape":"dot","size":14},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Banchero","label":"Paolo Banchero\nPF • Magic • 22/7/4","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Harden","label":"James Harden\nSG • Clippers • 17/5/8","shape":"dot","size":12},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Zion","label":"Zion Williamson\nPF • Pelicans • 23/6/4","shape":"dot","size":9},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Brown","label":"Jaylen Brown\nSG • Celtics • 26/7/3","shape":"dot","size":7},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Randle","label":"Julius Randle\nPF • Knicks • 24/10/5","shape":"dot","size":6},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Murray","label":"Jamal Murray\nPG • Nuggets • 21/4/6","shape":"dot","size":8},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Gobert","label":"Rudy Gobert\nC • Timberwolves • 14/12/1","shape":"dot","size":10},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Markkanen","label":"Lauri Markkanen\nPF • Jazz • 23/8/2","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Siakam","label":"Pascal Siakam\nPF • Pacers • 22/7/5","shape":"dot","size":7},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Porzingis","label":"Kristaps Porziņģis\nC • Celtics • 20/7/2","shape":"dot","size":6},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"VanVleet","label":"Fred VanVleet\nPG • Rockets • 17/4/8","shape":"dot","size":4},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Middleton","label":"Khris Middleton\nSF • Bucks • 15/5/5","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Beal","label":"Bradley Beal\nSG • Suns • 18/4/5","shape":"dot","size":6},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Adebayo","label":"Bam Adebayo\nC • Heat • 19/10/4","shape":"dot","size":8},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Ingram","label":"Brandon Ingram\nSF • Pelicans • 21/5/6","shape":"dot","size":7},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Garland","label":"Darius Garland\nPG • Cavaliers • 18/2/8","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Mobley","label":"Evan Mobley\nC • Cavaliers • 16/10/3","shape":"dot","size":6},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Bridges","label":"Mikal Bridges\nSF • Nets • 20/5/4","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Poole","label":"Jordan Poole\nSG • Wizards • 17/3/4","shape":"dot","size":4},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Cunningham","label":"Cade Cunningham\nPG • Pistons • 22/6/7","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Barnes","label":"Scottie Barnes\nSF • Raptors • 19/8/6","shape":"dot","size":6},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Wagner","label":"Franz Wagner\nSF • Magic • 19/4/4","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Holmgren","label":"Chet Holmgren\nC • Thunder • 17/8/3","shape":"dot","size":5},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Miller","label":"Brandon Miller\nSF • Hornets • 16/4/2","shape":"dot","size":4},
+  {"color":"#97c2fc","font":{"color":"white"},"id":"Henderson","label":"Scoot Henderson\nPG • Trail Blazers • 14/3/5","shape":"dot","size":4}
+]);
+
+const edges = new vis.DataSet([
+  {"from":"LeBron","to":"Durant","value":762,"width":1,"label":"Rivalry"},
+  {"from":"LeBron","to":"Davis","value":389,"width":1,"label":"Pick-and-Roll"},
+  {"from":"LeBron","to":"Curry","value":276,"width":1,"label":"Finals Matchups"},
+  {"from":"Durant","to":"Booker","value":531,"width":1,"label":"Suns Duo"},
+  {"from":"Curry","to":"Thompson","value":163,"width":1,"label":"Splash Bros"},
+  {"from":"Jokic","to":"Murray","value":110,"width":1,"label":"2-Man Game"},
+  {"from":"Giannis","to":"Lillard","value":132,"width":1,"label":"Bucks Core"},
+  {"from":"Luka","to":"Irving","value":184,"width":1,"label":"Mavs Backcourt"},
+  {"from":"Embiid","to":"Maxey","value":171,"width":1,"label":"76ers Pair"},
+  {"from":"Tatum","to":"Brown","value":167,"width":1,"label":"Celtics Duo"},
+  {"from":"Morant","to":"Jackson","value":131,"width":1,"label":"Grizzlies Core"},
+  {"from":"Haliburton","to":"Turner","value":130,"width":1,"label":"Pacers Pick-and-Pop"},
+  {"from":"SGA","to":"Holmgren","value":110,"width":1,"label":"Thunder Future"},
+  {"from":"Wembanyama","to":"Popovich","value":102,"width":1,"label":"Rookie Coach"},
+  {"from":"Edwards","to":"Gobert","value":98,"width":1,"label":"Wolves Defense"},
+  {"from":"Sabonis","to":"Fox","value":82,"width":1,"label":"Kings Fastbreak"},
+  {"from":"Banchero","to":"Wagner","value":80,"width":1,"label":"Magic Young Core"},
+  {"from":"Harden","to":"Leonard","value":68,"width":1,"label":"Clippers Stars"},
+  {"from":"Zion","to":"Ingram","value":65,"width":1,"label":"Pelicans Offense"},
+  {"from":"Adebayo","to":"Butler","value":65,"width":1,"label":"Heat Culture"},
+  {"from":"Garland","to":"Mobley","value":60,"width":1,"label":"Cavs Young Core"},
+  {"from":"Bridges","to":"Simmons","value":59,"width":1,"label":"Nets Defense"},
+  {"from":"Cunningham","to":"Duren","value":58,"width":1,"label":"Pistons Rebuild"},
+  {"from":"Barnes","to":"Siakam","value":48,"width":1,"label":"Raptors Wings"},
+  {"from":"Miller","to":"Ball","value":48,"width":1,"label":"Hornets Backcourt"}
+]);
+
+//END
+
+nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
